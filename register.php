@@ -1,25 +1,38 @@
+<?php
+require_once 'config.php';
+session_start();
+
+// Redirect if already logged in
+if (isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Komorebi</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Register - Sakura Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Registration page specific styles */
+        /* Add your existing sakura animation and base styles here */
+        
+        /* Registration specific styles */
         .register-container {
             max-width: 600px;
             margin: 3rem auto;
             padding: 2rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(89, 56, 44, 0.1);
             position: relative;
             z-index: 10;
         }
         
         .register-container h2 {
-            color: var(--pink2);
+            color: #E79796;
             text-align: center;
             margin-bottom: 1.5rem;
             font-size: 2rem;
@@ -39,7 +52,7 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--brown);
+            color: #59382C;
             font-weight: 500;
         }
         
@@ -47,55 +60,56 @@
         .form-group select {
             width: 100%;
             padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #E79796;
+            border-radius: 8px;
             font-size: 1rem;
-            transition: border 0.3s;
-            background-color: var(--cream);
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.8);
+            font-family: 'Noto Sans JP', sans-serif;
         }
         
         .form-group input:focus, 
         .form-group select:focus {
-            border-color: var(--pink1);
+            border-color: #FFB6C1;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(255,182,193,0.3);
+            box-shadow: 0 0 0 3px rgba(231, 151, 150, 0.3);
         }
         
         .register-btn {
-            background: var(--pink1);
+            background: #E79796;
             color: white;
             border: none;
             padding: 1rem;
             width: 100%;
-            border-radius: 5px;
+            border-radius: 25px;
             font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 1rem;
-            font-weight: bold;
+            font-weight: 500;
         }
         
         .register-btn:hover {
-            background: var(--pink2);
+            background: #FFB6C1;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(231, 151, 150, 0.3);
         }
         
         .login-link {
             text-align: center;
             margin-top: 1.5rem;
-            color: var(--brown);
+            color: #59382C;
         }
         
         .login-link a {
-            color: var(--pink2);
+            color: #E79796;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
         }
         
         .login-link a:hover {
-            color: var(--pink1);
+            color: #FFB6C1;
             text-decoration: underline;
         }
         
@@ -105,15 +119,11 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: #59382C;
         }
         
         .terms input[type="checkbox"] {
             width: auto;
-        }
-        
-        .terms label {
-            margin-bottom: 0;
-            color: var(--brown);
         }
         
         .error-message {
@@ -143,18 +153,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .password-strength {
-            margin-top: 0.5rem;
-            height: 4px;
-            background-color: #eee;
-            border-radius: 2px;
-            overflow: hidden;
+        .password-container {
+            position: relative;
         }
         
-        .strength-bar {
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s, background-color 0.3s;
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            cursor: pointer;
+            color: #E79796;
         }
         
         /* Responsive adjustments */
@@ -172,155 +180,113 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Komorebi</h1>
-        <p>Sunlight through leaves - Share your Japan experience</p>
-    </header>
+    <div class="sakura-container">
+        <div class="sakura"></div>
+        <div class="sakura"></div>
+        <div class="sakura"></div>
+        <div class="sakura"></div>
+        <div class="sakura"></div>
+    </div>
 
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="login.html">Login</a>
-        <a href="register.html" class="active">Register</a>
-    </nav>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🌸 Sakura Board</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.php" class="nav-link">Home</a>
+                <a href="login.php" class="nav-link">Login</a>
+                <a href="register.php" class="nav-link active">Register</a>
+            </nav>
+        </div>
+    </header>
 
     <main>
         <div class="register-container">
             <h2>Create Your Account</h2>
             
-            <!-- Error/Success Messages -->
             <?php if (isset($_GET['error'])): ?>
                 <div class="error-message">
                     <?php 
-                        if ($_GET['error'] === 'email_exists') {
-                            echo "✗ This email is already registered. Please login or use a different email.";
-                        } elseif ($_GET['error'] === 'database_error') {
-                            echo "✗ Database error occurred. Please try again later.";
-                        } elseif ($_GET['error'] === 'password_mismatch') {
-                            echo "✗ Passwords do not match. Please try again.";
-                        } elseif ($_GET['error'] === 'terms_not_accepted') {
-                            echo "✗ You must accept the terms and conditions to register.";
-                        }
+                        $errors = [
+                            'email_exists' => "This email is already registered. Please login or use a different email.",
+                            'database_error' => "Database error occurred. Please try again later.",
+                            'password_mismatch' => "Passwords do not match. Please try again.",
+                            'terms_not_accepted' => "You must accept the terms and conditions to register."
+                        ];
+                        echo $errors[$_GET['error']] ?? "An error occurred during registration.";
                     ?>
-                </div>
-            <?php elseif (isset($_GET['success'])): ?>
-                <div class="success-message">
-                    ✓ Registration successful! You can now <a href="login.html">login</a>.
                 </div>
             <?php endif; ?>
 
-            <form id="registerForm" action="php/register.php" method="POST" onsubmit="return validateForm()">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="first_name">First Name</label>
-                        <input type="text" id="first_name" name="first_name" required 
-                               placeholder="e.g. Sakura" autocomplete="given-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" required 
-                               placeholder="e.g. Tanaka" autocomplete="family-name">
-                    </div>
+            <form id="registerForm" action="php/register.php" method="POST">
+                <div class="form-group">
+                    <label for="author_name">Full Name</label>
+                    <input type="text" id="author_name" name="author_name" required 
+                           placeholder="e.g. Sakura Tanaka" autocomplete="name">
                 </div>
                 
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required 
+                    <label for="author_email">Email Address</label>
+                    <input type="email" id="author_email" name="author_email" required 
                            placeholder="your.email@example.com" autocomplete="email">
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group password-container">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required 
-                               placeholder="At least 8 characters" minlength="8"
-                               oninput="checkPasswordStrength(this.value)">
-                        <div class="password-strength">
-                            <div class="strength-bar" id="strengthBar"></div>
-                        </div>
+                               placeholder="At least 8 characters" minlength="8">
+                        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group password-container">
                         <label for="confirm_password">Confirm Password</label>
                         <input type="password" id="confirm_password" name="confirm_password" required 
                                placeholder="Re-enter your password">
+                        <span class="toggle-password" onclick="togglePassword('confirm_password')">👁️</span>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="location">Location in Japan</label>
-                    <select id="location" name="location" autocomplete="country-name">
-                        <option value="">Select your location...</option>
-                        <option value="Tokyo">Tokyo</option>
-                        <option value="Osaka">Osaka</option>
-                        <option value="Kyoto">Kyoto</option>
-                        <option value="Hokkaido">Hokkaido</option>
-                        <option value="Okinawa">Okinawa</option>
-                        <option value="Other">Other</option>
-                    </select>
                 </div>
                 
                 <div class="terms">
                     <input type="checkbox" id="terms" name="terms" required>
-                    <label for="terms">I agree to the <a href="#" style="color: var(--pink2);">Terms and Conditions</a></label>
+                    <label for="terms">I agree to the <a href="terms.php" style="color: #E79796;">Terms and Conditions</a></label>
                 </div>
                 
                 <button type="submit" class="register-btn">Create Account</button>
             </form>
             
             <div class="login-link">
-                <p>Already have an account? <a href="login.html">Login here</a></p>
+                <p>Already have an account? <a href="login.php">Login here</a></p>
             </div>
         </div>
     </main>
 
-    <script src="js/main.js"></script>
     <script>
-        // Password strength indicator
-        function checkPasswordStrength(password) {
-            const strengthBar = document.getElementById('strengthBar');
-            let strength = 0;
-            
-            // Length check
-            if (password.length >= 8) strength += 1;
-            if (password.length >= 12) strength += 1;
-            
-            // Character variety checks
-            if (/[A-Z]/.test(password)) strength += 1;
-            if (/[0-9]/.test(password)) strength += 1;
-            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
-            
-            // Update strength bar
-            const width = (strength / 5) * 100;
-            strengthBar.style.width = width + '%';
-            
-            // Update color
-            if (strength <= 2) {
-                strengthBar.style.backgroundColor = '#ff5252'; // Weak (red)
-            } else if (strength <= 4) {
-                strengthBar.style.backgroundColor = '#ffab40'; // Medium (orange)
-            } else {
-                strengthBar.style.backgroundColor = '#4caf50'; // Strong (green)
-            }
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === 'password' ? 'text' : 'password';
         }
-        
-        // Form validation
-        function validateForm() {
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
             const termsChecked = document.getElementById('terms').checked;
             
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
+                e.preventDefault();
                 document.getElementById('confirm_password').focus();
                 return false;
             }
             
             if (!termsChecked) {
                 alert('You must accept the terms and conditions to register.');
+                e.preventDefault();
                 return false;
             }
             
             return true;
-        }
+        });
     </script>
 </body>
 </html>
